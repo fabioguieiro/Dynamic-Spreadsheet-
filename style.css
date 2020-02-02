@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css?family=Indie+Flower&display=swap');
+#hide{
+    display: none;
+    margin-top: 3%;
+}
+
+img{
+    width: 150%;
+}
+table tr{
+    color: white;
+}
+
+.navbarTittle{
+    font-family: 'Indie Flower', cursive;
+    color: white;
+    font-size: 25px;
+    margin-top: 10px;
+    width: 60%;
+}
+.align-bottom{
+    font-family: 'Indie Flower', cursive;
+    font-size: 20px;
+    color: white;
+    margin-top: 45px;
+}
+
+.hide2{
+    margin-top: 10px;
+}
+.submit{
+    margin-top: 1%;
+    width: 30%;
+    margin-bottom: 2%;
+}
+.table_edit{
+    margin-top: 2%;
+    margin-bottom: 1%;
+}

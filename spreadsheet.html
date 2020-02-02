@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dynamic Spreadsheet</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./logo.ico">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a href="https://www.govpredict.com/"> <img src="https://www.govpredict.com/hubfs/Govpredict-October2019/Images/govpredict-d2ac8edd9dc1af5cb1b14eab8109e58732989c88f206ab57715b6207dfac1826.svg" alt="GovPredict logo"></a>
+        <h1 class="navbarTittle">Dynamic Spreadsheet</h1>
+    </nav>
+    <div id='app'>
+        <div class="container">
+            <div class="row">
+                <div class="col-6 d-flex justify-content-start" v-if="newRowNumber == 1">
+                    <p class="align-bottom" id="typewriting"></p>
+                </div>
+                <div class="col-6 d-flex justify-content-start" v-else>
+
+                </div>
+                <div class="col-6 table_edit d-flex justify-content-end">
+                    <button class="btn btn-outline-light" v-on:click="addRow">Add row</button>
+                    <button class="btn btn-outline-light" v-on:click="add10Rows">Add 10 rows</button>
+                    <button class="btn btn-outline-light" v-on:click="showHide">Add column</button>
+                </div>
+            </div>
+
+                <div id="hide">
+                <form action="#">
+                    <div class="row">
+                        <div class="col-6">
+                        <select id="type" class="form form-control"  @change="getType">
+                            <option value="" disabled selected>Column type</option>
+                            <option value="Date">Date</option>
+                            <option value="Select">Select</option>
+                            <option value="Text">Text</option>
+                            <option value="Number">Number</option>
+                        </select>
+                        </div>
+                        <div class="col-6">
+                            <input id="name" class="form form-control" type="text" placeholder="The column name here...">
+                        </div>
+                    </div>      
+                    <div v-if=" columnType == 'Select' " class="row hide2">
+                        <div class="col-6">
+                            <input id="select-options" class="form form-control" type="text" placeholder="example: optionA/optionB/optionC ">
+                        </div>
+                    </div>   
+                    <div class="row d-flex justify-content-center">
+                        <button class="submit btn btn-success" type="submit" v-on:click="addColumn"> Add </button>
+                    </div>
+                </form>
+
+            </div>
+            <table class="table" id="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </body>
+    </html>
+    <script>
+    let app = new Vue({
+        el: '#app',
+        data: {
+            newRowNumber: 1,
+            showTip: true,
+            colIndex: 0,
+            hide: document.getElementById("hide"),
+            columns: [],
+            columnName: [],
+            columnType: document.getElementById('type').value,
+            typeIndex: 0,
+            text: 'First things first! Add a column using the button in your right',
+            textSpeed: 50
+        },
+    methods:{
+        showHide: function(){
+            $("#hide").slideToggle()
+        },
+
+        addRow: function(){
+            let row = $("<tr>");
+            this.getColumnTypes();
+            
+            row.append($("<td> <b>" + this.newRowNumber + "</b></td>"))
+            for(let x = 0; x <= this.colIndex-1; x++){
+                row.append($("<td>"+ this.columns[x].innerHTML +"</td>"))
+            }
+            $(".table tbody").append(row);
+            this.incrementNewRowNumber();
+        },
+        add10Rows: function(){
+            for(let x=0; x<10; x++){
+                this.addRow();
+            }
+        },
+        incrementNewRowNumber: function(){
+            this.newRowNumber++
+        },
+        getColumnTypes: function(){
+            if(this.colIndex > 0){
+                for(let x = 0; x <= this.colIndex; x++){
+                        this.columns[x] = document.getElementById("table").rows[1].cells[x+1]
+                }
+            }
+            
+            if(this.columnType == "Date"){
+                this.columns[this.colIndex] = "<input type='date' class='form-control date'>"
+            }
+            else if(this.columnType == "Select"){
+                let options = []
+                options = document.getElementById('select-options').value.split('/')
+                this.columns[this.colIndex] = "<select type='select' class='form-control'><option value='' disabled selected></option>"
+                for(let x = 0; x < options.length; x++)
+                        this.columns[this.colIndex] += "<option value='"+options[x]+"'>"+options[x]+"</option>"
+                this.columns[this.colIndex] += "</select>" 
+            }
+            else if(this.columnType == "Text"){
+                this.columns[this.colIndex] = "<input type='text' class='form-control' placeholder='your text here...' value=''>"
+            }
+            else if(this.columnType == "Number"){
+                this.columns[this.colIndex] = "<input type='number' class='form-control'>"
+            }
+        }, 
+        addColumn:function(){
+
+            this.columnName = document.getElementById("name").value 
+            let col = $("<th scope=col contenteditable='true'>"+ this.columnName +"</th>")
+            $(".table thead tr").append(col);
+            this.columnType =  document.getElementById("type").value  
+            this.getColumnTypes()
+
+            let rows = []
+            let table = document.getElementById('table')
+            let rowCount = document.getElementById('table').rows.length - 1
+            if(this.colIndex == 0){
+                let row = $("<tr>");
+                row.append($("<td> <b>" + this.newRowNumber + "</b></td>"))
+                for(let x = 0; x <= this.colIndex; x++){
+                    row.append($("<td>"+  this.columns[this.colIndex] +"</td>"))
+                }
+                $(".table tbody").append(row);
+                this.incrementNewRowNumber();
+                
+            }else{
+            for (let x = 1; x <= rowCount; x++){
+                rows.push($(table.rows[x]))
+            }
+            for (let x = 0; x<rows.length;x++){
+                rows[x].append($("<td>" + this.columns[this.colIndex]+ "</td>"))
+            }
+            }
+            this.colIndex++
+            this.showHide()
+            if(this.colIndex == 1){
+                this.add9Rows()
+            }
+
+        },
+        typewriting: function(){
+            if (this.typeIndex < this.text.length) {
+                document.getElementById("typewriting").innerHTML += this.text.charAt(this.typeIndex);
+                this.typeIndex++;
+                setTimeout(this.typewriting, this.textSpeed);
+            }
+            this.showTip = false
+        },
+        add9Rows: function(){
+            for(let x=0; x<9; x++){
+                this.addRow();
+            }
+        },
+        getType: function(){
+            this.columnType = document.getElementById('type').value
+        }
+
+    },
+    created() {
+        this.typewriting()
+    },
+})
+</script>
+<style>
+  
+  * {
+      margin: 0;
+      padding: 0;
+      outline: 0;
+      box-sizing: border-box;
+  }
+    body{
+        background: rgba(60,117,222,1);
+
+    }
+
+</style>
